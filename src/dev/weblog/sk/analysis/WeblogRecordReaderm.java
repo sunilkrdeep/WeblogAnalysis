@@ -11,6 +11,9 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.LineRecordReader;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,9 +50,18 @@ public class WeblogRecordReaderm extends RecordReader<Text, WeblogWritablem> {
        // Pattern webLogPattern = Pattern.compile("^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(.+?)\" (\\d{3}) (\\d+|.) \"([^\"]*)\" \"([^\"]*)\"");
     
     String LogPattern = "^([\\d.]+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(.+?)\" (\\d{3})[\\s?](?:(\\d+)|\\S) \"([^\"]+)\" \"([^\"]+)\"";
+    String UrlPattern = "(http|https)://(.*?)[/\\)\\?\\s$]";
+    String searchPattern = "(.*?)q=(.*?)(?:&(.*?)|$)";
+    String datePattern = "^(.*?):(.*?)";
     
     Pattern webLogPattern = Pattern.compile(LogPattern);
 
+    Pattern webUrlPattern = Pattern.compile(UrlPattern);
+    
+    Pattern webSearchPattern = Pattern.compile(searchPattern);
+    
+    Pattern webDatePattern = Pattern.compile(datePattern);
+    
     Matcher matcher = webLogPattern.matcher(lineReader.getCurrentValue().toString());
     
     if (!matcher.matches()) {
@@ -77,31 +89,77 @@ public class WeblogRecordReaderm extends RecordReader<Text, WeblogWritablem> {
     System.out.println("Referer: " + matcher.group(8));
     System.out.println("Browser: " + matcher.group(9));*/
     
-    
+   String Date="";
    String Referer = "";
     String IPadd = matcher.group(1);
-    String Datetime = matcher.group(4);
+    
+    String Datetime = matcher.group(4);   
+    
+   // System.out.println("Datetime :" + Datetime);
+    
+    Matcher dateMatcher = webDatePattern.matcher(Datetime);
+    
+    if(dateMatcher.find()){
+    	
+      Date = dateMatcher.group(1);
+    
+      System.out.println("Date  : " + Date);
+    }
+    
     String Request = matcher.group(5);
     int Response   = Integer.parseInt( matcher.group(6));
-    int Bytesent   = Integer.parseInt( matcher.group(7));
-   
- //   if (!matcher.group(8).equals("-"))
-    Referer =  matcher.group(8);
+    String responseByte = matcher.group(7);
+    
+    int Bytesent;
+    if(responseByte == null){
+    	Bytesent   = 0;
+    } else {
+    	Bytesent   = Integer.parseInt(responseByte);	
+    }
+    
+    String Urlstr="";
+    String Searchkey="";
     
     String Browser = matcher.group(9);
+     
+    
    
- 
+  if (!matcher.group(8).equals("-")){
+	  Referer =  matcher.group(8);
+	  
+	  Matcher urlMatcher = webUrlPattern.matcher(Referer);
+	  Matcher searchMatcher = webSearchPattern.matcher(Referer);
+	  
+	  if(urlMatcher.find()){
+	 // 	System.out.println("Referer Url :" +urlMatcher.group(2));	
+	  	Urlstr = urlMatcher.group(2);
+	  }
+	  if(searchMatcher.find()){
+	   // 	System.out.println("Search Key Word: " + searchMatcher.group(2));
+	    	Searchkey = searchMatcher.group(2);
+	    }
+	  
+  } 
+  else {
+	  
+	  Matcher browserMatcher = webUrlPattern.matcher(Browser);
+	  
+	   if (browserMatcher.find()){
+		//   System.out.println("Browser Url :" + browserMatcher.group(2));
+		
+		   Urlstr = browserMatcher.group(2);
+	   }
+	  
+	  
+  }
+	  
     
     key = new Text(IPadd);
     value = new WeblogWritablem();
-    value.set(IPadd, Datetime, Request, Referer, Browser,Response, Bytesent);
-    
-    //System.out.println("Key  :" + key);
-   // System.out.println("Value  :" + value);
-    
+    value.set(IPadd, Datetime, Request, Referer, Browser, Urlstr, Searchkey, Browser, Response, Bytesent);
+           
     return true;
-    
-    
+        
   }
 
   @Override
