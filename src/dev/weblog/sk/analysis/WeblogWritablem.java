@@ -15,31 +15,33 @@ import java.io.IOException;
 
 public class WeblogWritablem implements Writable {
 
-  private Text IPadd, Datetime, Request, Referer, Urlstr, Searchkey, Browser;
+  private Text IPadd, Datetime, Datestr, Request, Referer, Browser, Urlstr, Searchkey;
   private IntWritable Response, Bytesent;
 
   public WeblogWritablem() {
     this.IPadd = new Text();
     this.Datetime =  new Text();
+    this.Datestr = new Text();
     this.Request = new Text();
     this.Referer = new Text();
+    this.Browser = new Text();
     this.Urlstr = new Text();
     this.Searchkey = new Text();
-    this.Browser = new Text();
     this.Response = new IntWritable();
     this.Bytesent = new IntWritable();
   }
 
-  public void set (String IPadd, String Datetime, String Date, String Request, String Referer, String Browser, String UrlStr, String Searchkey, int Response, int Bytesent)
+  public void set (String IPadd, String Datetime, String Datestr, String Request, String Referer, String Browser, String UrlStr, String Searchkey, int Response, int Bytesent)
+ 
   {
     this.IPadd.set(IPadd);
     this.Datetime.set(Datetime);
-  //  this.Date.set(Date);
+    this.Datestr.set(Datestr);
     this.Request.set(Request);
     this.Referer.set(Referer);
+    this.Browser.set(Browser);
     this.Urlstr.set(Urlstr);
     this.Searchkey.set(Searchkey);
-    this.Browser.set(Browser);
     this.Response.set(Response);
     this.Bytesent.set(Bytesent);
   }
@@ -51,12 +53,12 @@ public class WeblogWritablem implements Writable {
   public void readFields(DataInput in) throws IOException {
     IPadd.readFields(in);
     Datetime.readFields(in);
-//    Date.readFields(in);
+    Datestr.readFields(in);
     Request.readFields(in);
     Referer.readFields(in);
+    Browser.readFields(in);
     Urlstr.readFields(in);
     Searchkey.readFields(in);
-    Browser.readFields(in);
     Response.readFields(in);
     Bytesent.readFields(in);
   }
@@ -68,12 +70,12 @@ public class WeblogWritablem implements Writable {
   public void write(DataOutput out) throws IOException {
     IPadd.write(out);
     Datetime.write(out);
-   // Date.write(out);
+    Datestr.write(out);
     Request.write(out);
     Referer.write(out);
+    Browser.write(out);
     Urlstr.write(out);
     Searchkey.write(out);
-    Browser.write(out);
     Response.write(out);
     Bytesent.write(out);
   }
@@ -95,9 +97,9 @@ public class WeblogWritablem implements Writable {
   return Datetime;
 }
  
- /* public Text getDate(){
-	  return Date;
-  }*/
+  public Text getDatestr(){
+	  return Datestr;
+  }
 
   public Text getRequest() {
     return Request;
@@ -107,18 +109,18 @@ public class WeblogWritablem implements Writable {
     return Referer;
   }
   
+  public Text getBrowser() {
+	    return  Browser;
+	  }
   public Text getUrlstr() {
 	    return Urlstr;
 	  }
+  
   public Text getSearchkey(){
 	  return Searchkey;
   }
 
-  public Text getBrowser() {
-    return  Browser;
-  }
   
-   
   public IntWritable getResponse() {
 	    return  Response;
 	  }

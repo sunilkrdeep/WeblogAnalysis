@@ -6,16 +6,18 @@ package dev.weblog.sk.analysis;
 
 import java.io.*;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.apache.hadoop.io.Text;
 
 import dev.weblog.sk.analysis.WeblogWritablem;
 //import org.json.simple.JSONObject;
 
 
-public class WeblogMapper extends Mapper<Text, WeblogWritablem,Text,Text> {
+public class WeblogMapper extends Mapper<Text, WeblogWritablem, NullWritable,Text> {
 		
 	@Override
 	protected void map(Text key, WeblogWritablem value, Context context) throws IOException, InterruptedException {
@@ -25,12 +27,12 @@ public class WeblogMapper extends Mapper<Text, WeblogWritablem,Text,Text> {
 		
 		String IPaddm = value.getIPadd().toString();
 		String Datetimem = value.getDatetime().toString();
-	//	String Datem     = value.getDate().toString();
+		String Datestrm     = value.getDatestr().toString();
 		String Requestm = value.getRequest().toString();
 		String Refererm = value.getRefere().toString();
+		String Browserm = value.getBrowser().toString();
 		String Urlstrm  = value.getUrlstr().toString();
 		String Searchkey = value.getSearchkey().toString();
-		String Browserm = value.getBrowser().toString();
 		String Responsem = value.getResponse().toString();
 		String Bytesentm = value.getBytesent().toString();
 		
@@ -56,16 +58,16 @@ public class WeblogMapper extends Mapper<Text, WeblogWritablem,Text,Text> {
 
 	      obj.put("IP_Add", IPaddm);
 	      obj.put("DateTime", Datetimem);
-	    //  obj.put("Date", Datem);
+	      obj.put("Datestr", Datestrm);
 	      obj.put("Request", Requestm);
 	      obj.put("Referer", Refererm);
+	      obj.put("Browser", Browserm);
 	      obj.put("Urlstr", Urlstrm);
 	      obj.put("Searchkey", Searchkey);
-	      obj.put("Browser", Browserm);
 	      obj.put("Response", Responsem);
 	      obj.put("ByteSent", Bytesentm);
 	      
-	  //    System.out.print(obj);
+	      //    System.out.print(obj);
 	      
 	       str1 = obj.toString();
 	      
@@ -83,7 +85,8 @@ public class WeblogMapper extends Mapper<Text, WeblogWritablem,Text,Text> {
 		System.out.println("Concanated String" + str1);*/
 		
 		
-		context.write(key,new Text(str1));
+		//context.write(key,new Text(str1));
+		context.write(NullWritable.get(),new Text(str1));
 	}
 }
 	
